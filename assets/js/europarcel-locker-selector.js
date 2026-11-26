@@ -123,6 +123,56 @@
 		let user_lockers = europarcelcom_wc_ajax.user_lockers;
 		let order_lockers = europarcelcom_wc_ajax.order_lockers;
 
+		// A saved locker counts only if the instance still offers its network
+		const offersCarrier = (instanceId, carrierId) => ((instances_lockers && instances_lockers[instanceId]) || []).map(Number).includes(Number(carrierId));
+
+		// Block cart: read-only box under the shipping total for the selected locker rate
+		if (checkoutType === 'cart') {
+			// The cart block shows the selected rate as text, so read it from the cart store
+			const selectedRateId = () => {
+				const cartStore = window.wp && wp.data ? wp.data.select('wc/store/cart') : null;
+				for (const pkg of cartStore ? cartStore.getShippingRates() : []) {
+					const rate = (pkg.shipping_rates || []).find((r) => r.selected);
+					if (rate) {
+						return rate.rate_id;
+					}
+				}
+				const radio = document.querySelector('.wc-block-components-radio-control__input:checked');
+				return radio ? radio.value : '';
+			};
+			const showCartLocker = () => {
+				const match = selectedRateId().match(/^europarcelcom_wc_shipping:(\d+)_\w*locker$/);
+				const saved = match && user_lockers ? user_lockers[match[1]] : null;
+				const locker = saved && offersCarrier(match[1], saved.carrier_id) ? saved : null;
+				let box = document.getElementById('europarcel-cart-locker');
+				if (!locker) {
+					if (box) {
+						box.remove();
+					}
+					return;
+				}
+				const key = `${match[1]}:${locker.locker_id}`;
+				const shippingRow = document.querySelector('.wc-block-components-totals-shipping');
+				// Skip when already shown: store and DOM updates call this often, our own insert included
+				if ((box && box.dataset.key === key) || !shippingRow) {
+					return;
+				}
+				if (!box) {
+					box = document.createElement('div');
+					box.id = 'europarcel-cart-locker';
+					shippingRow.after(box);
+				}
+				box.dataset.key = key;
+				box.replaceChildren(buildLockerBox(locker));
+			};
+			showCartLocker();
+			if (window.wp && wp.data) {
+				wp.data.subscribe(showCartLocker);
+			}
+			new MutationObserver(showCartLocker).observe(document.body, { childList: true, subtree: true });
+			return;
+		}
+
 		function updateButtonText(button, hasSelectedLocker) {
 			const newText = hasSelectedLocker ? europarcelcom_wc_ajax.i18n.modify_locker : europarcelcom_wc_ajax.i18n.select_locker;
 			button.textContent = newText;
@@ -136,61 +186,51 @@
 				return;
 			}
 
-			// Normalize data format (saved vs new selection have different property names)
-			const normalizedLocker = {
-				carrier_name: lockerData.carrier_name,
-				name: lockerData.locker_name || lockerData.name,
-				address: lockerData.locker_address || lockerData.address
-			};
-
-			if (checkoutType === 'blocks') {
-				const blocksButton = document.getElementById('europarcel-blocks-locker-btn');
-				const blocksDetails = document.getElementById('europarcel-blocks-location-details');
-				
-				if (blocksButton) {
-					blocksButton.textContent = europarcelcom_wc_ajax.i18n.modify_locker;
-				}
-
-				if (blocksDetails) {
-					blocksDetails.innerHTML = `
-						<div style="margin-top: 10px; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background-color: rgba(0,0,0,0.02);">
-							<div style="font-weight: bold; margin-bottom: 4px;">
-								${europarcelcom_wc_ajax.i18n.locker_selected} ${normalizedLocker.carrier_name}
-							</div>
-							<div style="font-weight: 600; margin-bottom: 2px;">
-								${normalizedLocker.name}
-							</div>
-							<div style="margin-bottom: 0;">
-								${normalizedLocker.address}
-							</div>
-						</div>
-					`;
-					blocksDetails.style.display = 'block';
-				}
-			} else {
-				const classicButton = document.querySelector('button[onclick="openLockerSelector()"]');
-				if (classicButton) {
-					classicButton.textContent = europarcelcom_wc_ajax.i18n.modify_locker;
-				}
-
-				const details = document.getElementById('europarcel-location-details');
-				if (details) {
-					details.innerHTML = `
-						<div style="margin-top: 10px; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background-color: rgba(0,0,0,0.02);">
-							<div style="font-weight: bold; margin-bottom: 4px;">
-								${europarcelcom_wc_ajax.i18n.locker_selected} ${normalizedLocker.carrier_name}
-							</div>
-							<div style="font-weight: 600; margin-bottom: 2px;">
-								${normalizedLocker.name}
-							</div>
-							<div style="margin-bottom: 0;">
-								${normalizedLocker.address}
-							</div>
-						</div>
-					`;
-					details.style.display = 'block';
-				}
+			const button = checkoutType === 'blocks'
+				? document.getElementById('europarcel-blocks-locker-btn')
+				: document.querySelector('button[onclick="openLockerSelector()"]');
+			if (button) {
+				button.textContent = europarcelcom_wc_ajax.i18n.modify_locker;
 			}
+
+			const details = document.getElementById(checkoutType === 'blocks' ? 'europarcel-blocks-location-details' : 'europarcel-location-details');
+			if (details) {
+				details.replaceChildren(buildLockerBox(lockerData));
+				details.style.display = 'block';
+			}
+		}
+
+		/**
+		 * Locker box as DOM nodes (data comes from outside, never as HTML); saved and new locker shapes
+		 */
+		function buildLockerBox(locker) {
+			const box = document.createElement('div');
+			box.style.cssText = 'margin-top: 10px; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background-color: rgba(0,0,0,0.02);';
+
+			const title = document.createElement('div');
+			title.style.cssText = 'font-weight: bold; margin-bottom: 4px;';
+			const logo = europarcelcom_wc_ajax.locker_logos && europarcelcom_wc_ajax.locker_logos[locker.carrier_id];
+			if (logo) {
+				const img = document.createElement('img');
+				img.src = logo.url;
+				img.alt = logo.name;
+				img.width = 48;
+				img.height = 24;
+				img.className = 'europarcel-locker-logo';
+				img.style.cssText = 'display: inline-block; vertical-align: middle; width: 48px; height: 24px; margin-right: 6px;';
+				title.appendChild(img);
+			}
+			title.appendChild(document.createTextNode(`${europarcelcom_wc_ajax.i18n.locker_selected} ${locker.carrier_name || ''}`));
+
+			const name = document.createElement('div');
+			name.style.cssText = 'font-weight: 600; margin-bottom: 2px;';
+			name.textContent = locker.locker_name || locker.name || '';
+
+			const address = document.createElement('div');
+			address.textContent = locker.locker_address || locker.address || '';
+
+			box.append(title, name, address);
+			return box;
 		}
 
 		/**
@@ -216,7 +256,7 @@
 			}
                      * 
                          */
-                        if (instanceId in user_lockers) {
+                        if (instanceId in user_lockers && offersCarrier(instanceId, user_lockers[instanceId].carrier_id)) {
                             displayLockerInfo(user_lockers[instanceId]);
                             return;
                         }
@@ -354,7 +394,7 @@
         }
 
         window.addEventListener('message', function (event) {
-            if (!event.origin.includes('maps.europarcel.com')) {
+            if (event.origin !== 'https://maps.europarcel.com') {
                 return;
             }
 

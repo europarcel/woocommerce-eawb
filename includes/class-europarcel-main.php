@@ -112,6 +112,10 @@ class EuroParcelComWC_Main {
 
 		// Classic checkout integration
 		add_action('woocommerce_review_order_after_shipping', array($this->checkout_handler, 'classic_checkout_button'));
+		add_action('woocommerce_after_shipping_rate', array($this->checkout_handler, 'cart_rate_locker'), 10, 2);
+
+		// Buyer order views and emails: locker row after shipping in the order totals
+		add_filter('woocommerce_get_order_item_totals', array(new EuroParcelComWC_Order_Locker(), 'add_order_item_totals_row'), 10, 3);
 
 		// Admin order view — render locker details inline under the shipping line item
 		if (is_admin()) {

@@ -52,7 +52,7 @@ class EuroParcelComWC_Shipping_Method extends WC_Shipping_Method {
           $this->id .= '_' . $this->instance_id;
           }
          */
-        $this->method_title = __('Europarcel Shipping', 'europarcel-com');
+        $this->method_title = __('eAWB', 'europarcel-com');
         $this->method_description = __('Premium courier shipping integration with support for home delivery and locker services', 'europarcel-com');
         $this->supports = array('shipping-zones', 'instance-settings');
         $this->init();
@@ -75,7 +75,7 @@ class EuroParcelComWC_Shipping_Method extends WC_Shipping_Method {
         $this->settings = get_option('woocommerce_europarcelcom_wc_shipping_' . $this->instance_id . '_settings');
         $this->title = $this->get_option('title');
         $this->tax_status = $this->get_option('tax_status', 'taxable');
-        if (is_admin() && isset($_GET['page']) && $_GET['page'] === 'wc-settings') {
+        if (is_admin() && isset($_GET['page']) && sanitize_key(wp_unslash($_GET['page'])) === 'wc-settings') {
             $this->init_form_fields();
         }
     }
@@ -101,12 +101,13 @@ class EuroParcelComWC_Shipping_Method extends WC_Shipping_Method {
                 'title' => __('Method Title', 'europarcel-com'),
                 'type' => 'text',
                 'description' => __('The shipping method title displayed in the admin shipping zones configuration', 'europarcel-com'),
-                'default' => __('Europarcel Shipping', 'europarcel-com'),
+                'default' => __('eAWB', 'europarcel-com'),
                 'desc_tip' => false,
             ),
             'api_key' => array(
                 'title' => __('API Key', 'europarcel-com'),
-                'type' => 'text',
+                'type' => 'password',
+                'custom_attributes' => array('autocomplete' => 'new-password'),
                 'description' => __('Your API key for accessing the shipping services.<br><a href="https://www.eawb.ro/dashboard/integrations" target="_blank" class="button button-secondary" style="margin-top: 5px;">Get Your API Key Here →</a>', 'europarcel-com'),
                 'desc_tip' => false,
             ),
@@ -467,6 +468,10 @@ class EuroParcelComWC_Shipping_Method extends WC_Shipping_Method {
         $customer_locker_carriers = $customer->get_locker_carriers();
         if ($allow_locker_shipping && !empty($customer_locker_carriers)) {
             $locker_info = WC()->session->get('locker_info');
+            // A session pick from another zone's instance or a network no longer offered is not this rate's locker
+            if (!is_array($locker_info) || ($locker_info['instance_id'] ?? null) != $this->instance_id || !in_array($locker_info['carrier_id'] ?? null, $customer_locker_carriers)) {
+                $locker_info = null;
+            }
             $user_id = get_current_user_id();
 
             // Check for saved user locker preferences

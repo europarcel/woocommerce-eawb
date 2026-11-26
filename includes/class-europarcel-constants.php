@@ -117,6 +117,40 @@ class EuroParcelComWC_Constants {
 	}
 
 	/**
+	 * Locker network logos by carrier ID (DPD Box has no own logo, so DPD)
+	 *
+	 * @since    1.2.0
+	 * @param    string    $ext    Image format: webp, or png for emails
+	 * @return   array    carrier_id => ['url' => absolute image URL, 'name' => network name]
+	 */
+	public static function get_locker_logos($ext = 'webp') {
+		$logos = [
+			6 => ['file' => 'easybox-200.' . $ext, 'name' => 'easybox'],
+			3 => ['file' => 'fanbox-200.' . $ext, 'name' => 'FANbox'],
+			2 => ['file' => 'dpd-200.' . $ext, 'name' => 'DPD'],
+		];
+		foreach ($logos as $carrier_id => $logo) {
+			$logos[$carrier_id] = [
+				'url' => plugins_url('assets/images/' . $logo['file'], EUROPARCELCOM_WC_ROOT_PATH . '/europarcel-com.php'),
+				'name' => $logo['name'],
+			];
+		}
+		return $logos;
+	}
+
+	/**
+	 * Locker network logo for a carrier ID
+	 *
+	 * @since    1.2.0
+	 * @param    int       $carrier_id    Numeric carrier ID
+	 * @param    string    $ext           Image format: webp, or png for emails
+	 * @return   array|null    ['url', 'name'] or null for an unknown network
+	 */
+	public static function get_locker_logo($carrier_id, $ext = 'webp') {
+		return self::get_locker_logos($ext)[(int) $carrier_id] ?? null;
+	}
+
+	/**
 	 * Canonical carrier + service configuration table.
 	 *
 	 * Single source of truth keyed by service slug. Each entry carries the

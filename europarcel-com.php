@@ -12,17 +12,20 @@
  * @package           Europarcel
  *
  * @wordpress-plugin
- * Plugin Name:       EuroParcel Integration for WooCommerce
+ * Plugin Name:       eAWB for WooCommerce
  * Description:       Connect your WooCommerce store with eAWB shipping platform
- * Version:           1.1.1
- * Author:            EuroParcel
+ * Version:           1.2.0
+ * Requires at least: 6.5
+ * Requires PHP:      7.4
+ * Requires Plugins:  woocommerce
+ * Author:            eAWB
  * Author URI:        https://eawb.ro/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       europarcel-com
  * Domain Path:       /languages
  * WC requires at least: 5.0
- * WC tested up to:      8.9
+ * WC tested up to:      11.3
  */
 
 // If this file is called directly, abort.
@@ -30,7 +33,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('EUROPARCELCOM_WC_VERSION', '1.1.1');
+define('EUROPARCELCOM_WC_VERSION', '1.2.0');
 
 /**
  * Plugin constants
@@ -69,6 +72,7 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
 add_action('before_woocommerce_init', function() {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
     }
 });
 
@@ -167,8 +171,8 @@ add_action('woocommerce_store_api_checkout_update_order_from_request', function(
  */
 add_filter('plugin_row_meta', function($links, $file) {
     if (plugin_basename(__FILE__) === $file) {
-        $links[] = '<a href="https://www.eawb.ro/docs/woocommerce" target="_blank">' . esc_html__('Documentation', 'europarcel-com') . '</a>';
-        $links[] = '<a href="https://www.eawb.ro/docs/woocommerce" target="_blank">' . esc_html__('Video tutorial', 'europarcel-com') . '</a>';
+        $links[] = '<a href="https://www.eawb.ro/docs/woocommerce" target="_blank" rel="noopener noreferrer">' . esc_html__('Documentation', 'europarcel-com') . '</a>';
+        $links[] = '<a href="https://www.eawb.ro/docs/woocommerce" target="_blank" rel="noopener noreferrer">' . esc_html__('Video tutorial', 'europarcel-com') . '</a>';
     }
     return $links;
 }, 10, 2);

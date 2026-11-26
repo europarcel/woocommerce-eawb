@@ -78,8 +78,9 @@ class EuroParcelComWC_Admin_Order {
         $full_address_parts = array_filter([$locker_address, $locker_locality, $locker_county], 'strlen');
         $full_address = implode(', ', $full_address_parts);
 
+        $locker_logo = \EuroparcelComWCShipping\EuroParcelComWC_Constants::get_locker_logo($carrier_id);
         $carrier_name = $carrier_id > 0 ? \EuroparcelComWCShipping\EuroParcelComWC_Constants::get_carrier_name($carrier_id) : '';
-        $eawb_logo_url = plugins_url('assets/images/eawb-logo.webp', EUROPARCELCOM_WC_ROOT_PATH . '/europarcel-com.php');
+        $eawb_logo_url = plugins_url('assets/images/eawb-logo.svg', EUROPARCELCOM_WC_ROOT_PATH . '/europarcel-com.php');
 
         $order = $item->get_order();
         $country_code = ($order && $order->get_shipping_country()) ? $order->get_shipping_country() : 'RO';
@@ -90,6 +91,9 @@ class EuroParcelComWC_Admin_Order {
             </div>
             <?php if (!empty($locker_name)) : ?>
                 <div class="europarcel-item-details__row europarcel-item-details__locker-name">
+                    <?php if ($locker_logo) : ?>
+                        <img src="<?php echo esc_url($locker_logo['url']); ?>" alt="<?php echo esc_attr($locker_logo['name']); ?>" width="48" height="24" class="europarcel-item-details__network-logo" />
+                    <?php endif; ?>
                     <?php echo esc_html($locker_name); ?>
                     <?php if (!empty($carrier_name)) : ?>
                         <span class="europarcel-item-details__carrier-inline"><?php echo esc_html(' (' . $carrier_name . ')'); ?></span>

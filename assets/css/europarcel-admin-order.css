@@ -28,6 +28,13 @@
     color: #1d2327;
 }
 
+.europarcel-item-details__network-logo {
+    height: 24px;
+    width: auto;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
 .europarcel-item-details__carrier-inline {
     font-weight: 400;
     color: #50575e;
