@@ -66,10 +66,6 @@ msgstr "Se încarcă..."
 msgid "No couriers configured for locker delivery."
 msgstr "Nu există curieri configurați pentru livrare în locker."
 
-#: includes/class-europarcel-checkout.php:179
-msgid "✓ Locker selected -"
-msgstr "✓ Locker selectat -"
-
 #: includes/class-europarcel-checkout.php:180
 msgid "Delivery locker selection"
 msgstr "Selectarea lockerului de livrare"

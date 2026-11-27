@@ -61,10 +61,6 @@ msgstr ""
 msgid "No couriers configured for locker delivery."
 msgstr ""
 
-#: includes/class-europarcel-checkout.php:179
-msgid "✓ Locker selected -"
-msgstr ""
-
 #: includes/class-europarcel-checkout.php:180
 msgid "Delivery locker selection"
 msgstr ""

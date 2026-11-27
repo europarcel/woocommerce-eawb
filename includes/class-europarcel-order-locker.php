@@ -60,7 +60,7 @@ class EuroParcelComWC_Order_Locker {
     }
 
     /**
-     * Locker markup: network logo (inline size, so themes and email clients keep it small), name, address
+     * Locker markup: network logo on its own line (inline size for themes and email clients), name, address
      *
      * @since    1.2.0
      * @param    int       $carrier_id    Numeric carrier ID
@@ -73,7 +73,7 @@ class EuroParcelComWC_Order_Locker {
         $logo = \EuroparcelComWCShipping\EuroParcelComWC_Constants::get_locker_logo($carrier_id, $ext);
         $html = '<div class="europarcel-locker">';
         if ($logo) {
-            $html .= '<img src="' . esc_url($logo['url']) . '" alt="' . esc_attr($logo['name']) . '" width="48" height="24" class="europarcel-locker-logo" style="display:inline-block;vertical-align:middle;width:48px;height:24px;margin-right:6px;" />';
+            $html .= '<img src="' . esc_url($logo['url']) . '" alt="' . esc_attr($logo['name']) . '" width="48" height="24" class="europarcel-locker-logo" style="display:block;width:48px;height:24px;margin-bottom:4px;" />';
         }
         $html .= '<strong class="europarcel-locker-name">' . esc_html($name) . '</strong>';
         if ($address !== '') {

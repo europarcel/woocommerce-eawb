@@ -207,8 +207,7 @@
 			const box = document.createElement('div');
 			box.style.cssText = 'margin-top: 10px; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background-color: rgba(0,0,0,0.02);';
 
-			const title = document.createElement('div');
-			title.style.cssText = 'font-weight: bold; margin-bottom: 4px;';
+			// Logo on its own line, then name and address; unknown network: no logo line
 			const logo = europarcelcom_wc_ajax.locker_logos && europarcelcom_wc_ajax.locker_logos[locker.carrier_id];
 			if (logo) {
 				const img = document.createElement('img');
@@ -217,10 +216,9 @@
 				img.width = 48;
 				img.height = 24;
 				img.className = 'europarcel-locker-logo';
-				img.style.cssText = 'display: inline-block; vertical-align: middle; width: 48px; height: 24px; margin-right: 6px;';
-				title.appendChild(img);
+				img.style.cssText = 'display: block; width: 48px; height: 24px; margin-bottom: 4px;';
+				box.appendChild(img);
 			}
-			title.appendChild(document.createTextNode(`${europarcelcom_wc_ajax.i18n.locker_selected} ${locker.carrier_name || ''}`));
 
 			const name = document.createElement('div');
 			name.style.cssText = 'font-weight: 600; margin-bottom: 2px;';
@@ -229,7 +227,7 @@
 			const address = document.createElement('div');
 			address.textContent = locker.locker_address || locker.address || '';
 
-			box.append(title, name, address);
+			box.append(name, address);
 			return box;
 		}
 

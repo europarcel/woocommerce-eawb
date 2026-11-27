@@ -186,7 +186,6 @@ class EuroParcelComWC_Checkout {
                 'modify_locker' => __('Modify Locker', 'europarcel-com'),
                 'loading' => __('Loading...', 'europarcel-com'),
                 'no_carriers_configured' => __('No couriers configured for locker delivery.', 'europarcel-com'),
-                'locker_selected' => __('✓ Locker selected -', 'europarcel-com'),
                 'locker_selection_title' => __('Delivery locker selection', 'europarcel-com')
             ]
         ];
