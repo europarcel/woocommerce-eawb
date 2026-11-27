@@ -119,7 +119,7 @@ class EuroParcelComWC_Constants {
 	/**
 	 * Locker network logos by carrier ID (DPD Box has no own logo, so DPD)
 	 *
-	 * @since    1.2.0
+	 * @since    1.5.0
 	 * @param    string    $ext    Image format: webp, or png for emails
 	 * @return   array    carrier_id => ['url' => absolute image URL, 'name' => network name]
 	 */
@@ -141,7 +141,7 @@ class EuroParcelComWC_Constants {
 	/**
 	 * Locker network logo for a carrier ID
 	 *
-	 * @since    1.2.0
+	 * @since    1.5.0
 	 * @param    int       $carrier_id    Numeric carrier ID
 	 * @param    string    $ext           Image format: webp, or png for emails
 	 * @return   array|null    ['url', 'name'] or null for an unknown network

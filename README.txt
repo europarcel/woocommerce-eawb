@@ -4,7 +4,7 @@ Tags: woocommerce, shipping, europarcel, courier, romania
 Requires at least: 6.5
 Tested up to: 7.2
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.5.0
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -76,7 +76,7 @@ Yes, the plugin is fully compatible with WooCommerce High-Performance Order Stor
 
 == Changelog ==
 
-= 1.2.0 =
+= 1.5.0 =
 * Renamed to eAWB for WooCommerce, with the new eAWB logo
 * The chosen locker is shown with its network logo (easybox, FANbox, DPD) at checkout, in the cart, on the order received page, in My Account and in the order emails
 * Security: locker map messages are accepted only from maps.europarcel.com, locker details are rendered as text, and the locker AJAX accepts only the couriers the shipping method offers
@@ -127,7 +127,7 @@ Yes, the plugin is fully compatible with WooCommerce High-Performance Order Stor
 
 == Upgrade Notice ==
 
-= 1.2.0 =
+= 1.5.0 =
 eAWB rebranding, locker network logo for customers (cart, checkout, order page, emails) and security fixes. Existing settings and orders are kept. Requires WordPress 6.5 or newer.
 
 = 1.1.1 =

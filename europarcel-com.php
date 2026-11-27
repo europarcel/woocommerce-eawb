@@ -14,7 +14,7 @@
  * @wordpress-plugin
  * Plugin Name:       eAWB for WooCommerce
  * Description:       Connect your WooCommerce store with eAWB shipping platform
- * Version:           1.2.0
+ * Version:           1.5.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('EUROPARCELCOM_WC_VERSION', '1.2.0');
+define('EUROPARCELCOM_WC_VERSION', '1.5.0');
 
 /**
  * Plugin constants

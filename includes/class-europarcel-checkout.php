@@ -381,7 +381,7 @@ class EuroParcelComWC_Checkout {
     /**
      * Show the chosen locker under the selected locker rate on the classic cart (checkout has its own row)
      *
-     * @since    1.2.0
+     * @since    1.5.0
      * @param    WC_Shipping_Rate    $method    Shipping rate
      * @param    int                 $index     Package index
      */

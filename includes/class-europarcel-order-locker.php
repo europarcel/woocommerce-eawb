@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
  * Chosen locker with its network logo for the buyer (cart, thank-you, My Account, emails)
  *
  * @link       https://eawb.ro
- * @since      1.2.0
+ * @since      1.5.0
  *
  * @package    Europarcel
  * @subpackage Europarcel/includes
@@ -18,7 +18,7 @@ require_once EUROPARCELCOM_WC_ROOT_PATH . '/includes/class-europarcel-constants.
 /**
  * EuroParcel Order Locker Class
  *
- * @since      1.2.0
+ * @since      1.5.0
  * @package    Europarcel
  * @subpackage Europarcel/includes
  */
@@ -27,7 +27,7 @@ class EuroParcelComWC_Order_Locker {
     /**
      * Locker row after shipping in the order totals (thank-you, My Account, emails)
      *
-     * @since    1.2.0
+     * @since    1.5.0
      * @param    array       $total_rows     Order totals rows
      * @param    WC_Order    $order          The order
      * @param    string      $tax_display    Tax display mode
@@ -62,7 +62,7 @@ class EuroParcelComWC_Order_Locker {
     /**
      * Locker markup: network logo on its own line (inline size for themes and email clients), name, address
      *
-     * @since    1.2.0
+     * @since    1.5.0
      * @param    int       $carrier_id    Numeric carrier ID
      * @param    string    $name          Locker name
      * @param    string    $address       Full locker address
