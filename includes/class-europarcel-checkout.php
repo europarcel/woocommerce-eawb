@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
  */
 require_once EUROPARCELCOM_WC_ROOT_PATH . '/includes/class-europarcel-constants.php';
 require_once EUROPARCELCOM_WC_ROOT_PATH . '/includes/class-europarcel-customer.php';
+require_once EUROPARCELCOM_WC_ROOT_PATH . '/includes/class-europarcel-order-locker.php';
 
 /**
  * EuroParcel Checkout Class
@@ -64,13 +65,15 @@ class EuroParcelComWC_Checkout {
      * @since    1.0.9
      */
     public function smart_init() {
-        if (!is_checkout()) {
+        // Block cart gets the same script, read-only; the classic cart is served by cart_rate_locker
+        $is_block_cart = is_cart() && has_block('woocommerce/cart');
+        if (!is_checkout() && !$is_block_cart) {
             return;
         }
 
         $this->is_blocks_checkout = has_block('woocommerce/checkout');
 
-        if ($this->is_blocks_checkout) {
+        if ($this->is_blocks_checkout || $is_block_cart) {
             $this->init_blocks_checkout();
         } else {
             $this->init_classic_checkout();
@@ -124,6 +127,12 @@ class EuroParcelComWC_Checkout {
                     $order_lockers[] = $locker['carrier_id'];
                 }
             }
+        } else {
+            // Guests keep their pick only in the session; restore it after a reload
+            $session_locker = WC()->session ? WC()->session->get('locker_info') : null;
+            if (!empty($session_locker['instance_id'])) {
+                $user_lockers = [$session_locker['instance_id'] => $session_locker];
+            }
         }
 
         // Get all shipping method instances from shipping zones
@@ -170,13 +179,13 @@ class EuroParcelComWC_Checkout {
             'order_lockers' => $order_lockers,
             'instances_lockers' => $instances_lockers,
             'plugin_url' => plugins_url('', dirname(__DIR__) . '/europarcel-com.php'),
-            'checkout_type' => $this->is_blocks_checkout ? 'blocks' : 'classic',
+            'checkout_type' => !is_checkout() ? 'cart' : ($this->is_blocks_checkout ? 'blocks' : 'classic'),
+            'locker_logos' => \EuroparcelComWCShipping\EuroParcelComWC_Constants::get_locker_logos(),
             'i18n' => [
                 'select_locker' => __('Select Locker', 'europarcel-com'),
                 'modify_locker' => __('Modify Locker', 'europarcel-com'),
                 'loading' => __('Loading...', 'europarcel-com'),
                 'no_carriers_configured' => __('No couriers configured for locker delivery.', 'europarcel-com'),
-                'locker_selected' => __('✓ Locker selected -', 'europarcel-com'),
                 'locker_selection_title' => __('Delivery locker selection', 'europarcel-com')
             ]
         ];
@@ -229,11 +238,15 @@ class EuroParcelComWC_Checkout {
             return;
         }
 
-        if (isset($_POST['locker_id']) && isset($_POST['carrier_id']) && isset($_POST['instance_id'])) {
+        $instance_id = isset($_POST['instance_id']) && is_numeric($_POST['instance_id']) ? absint($_POST['instance_id']) : 0;
+        $carrier_id = isset($_POST['carrier_id']) && is_numeric($_POST['carrier_id']) ? absint($_POST['carrier_id']) : 0;
+        $customer = new \EuroparcelComWCShipping\EuroParcelComWC_Customer($instance_id);
+        // Only a locker network this instance offers
+        if (isset($_POST['locker_id']) && is_scalar($_POST['locker_id']) && $instance_id && in_array($carrier_id, array_map('intval', $customer->get_locker_carriers()), true)) {
             $locker_info = array(
                 'locker_id' => sanitize_text_field(wp_unslash($_POST['locker_id'])),
-                'carrier_id' => sanitize_text_field(wp_unslash($_POST['carrier_id'])),
-                'instance_id' => sanitize_text_field(wp_unslash($_POST['instance_id'])),
+                'carrier_id' => $carrier_id,
+                'instance_id' => $instance_id,
                 'carrier_name' => isset($_POST['carrier_name']) ? sanitize_text_field(wp_unslash($_POST['carrier_name'])) : '',
                 'locker_name' => isset($_POST['locker_name']) ? sanitize_text_field(wp_unslash($_POST['locker_name'])) : '',
                 'locker_address' => isset($_POST['locker_address']) ? sanitize_text_field(wp_unslash($_POST['locker_address'])) : '',
@@ -246,6 +259,7 @@ class EuroParcelComWC_Checkout {
             foreach ($packages as $package_key => $package) {
                 WC()->session->set('shipping_for_package_' . $package_key, false);
             }
+            $user_lockers = [$locker_info['instance_id'] => $locker_info];
             $user_id = get_current_user_id();
             if ($user_id) {
                 $user_lockers = get_user_meta($user_id, 'europarcelcom_wc_carrier_lockers', true);
@@ -305,10 +319,13 @@ class EuroParcelComWC_Checkout {
             return null;
         }
 
+        // Only lockers of a network the instance still offers (same check as calculate_shipping)
+        $locker_carriers = $instance_id !== null ? array_map('intval', (new \EuroparcelComWCShipping\EuroParcelComWC_Customer($instance_id))->get_locker_carriers()) : [];
+
         // Check session locker_info
         $locker_info = WC()->session->get('locker_info');
         if (!empty($locker_info) && !empty($locker_info['locker_id'])) {
-            if ($instance_id === null || (isset($locker_info['instance_id']) && $locker_info['instance_id'] == $instance_id)) {
+            if ($instance_id === null || (isset($locker_info['instance_id']) && $locker_info['instance_id'] == $instance_id && in_array((int) ($locker_info['carrier_id'] ?? 0), $locker_carriers, true))) {
                 return null;
             }
         }
@@ -317,7 +334,7 @@ class EuroParcelComWC_Checkout {
         $user_id = get_current_user_id();
         if ($user_id && $instance_id !== null) {
             $user_lockers = get_user_meta($user_id, 'europarcelcom_wc_carrier_lockers', true);
-            if (is_array($user_lockers) && isset($user_lockers[$instance_id]) && !empty($user_lockers[$instance_id]['locker_id'])) {
+            if (is_array($user_lockers) && isset($user_lockers[$instance_id]) && !empty($user_lockers[$instance_id]['locker_id']) && in_array((int) ($user_lockers[$instance_id]['carrier_id'] ?? 0), $locker_carriers, true)) {
                 return null;
             }
         }
@@ -359,6 +376,26 @@ class EuroParcelComWC_Checkout {
                 400
             );
         }
+    }
+
+    /**
+     * Show the chosen locker under the selected locker rate on the classic cart (checkout has its own row)
+     *
+     * @since    1.5.0
+     * @param    WC_Shipping_Rate    $method    Shipping rate
+     * @param    int                 $index     Package index
+     */
+    public function cart_rate_locker($method, $index) {
+        if (!is_cart() || is_checkout() || $method->get_method_id() !== 'europarcelcom_wc_shipping') {
+            return;
+        }
+        $chosen_methods = WC()->session->get('chosen_shipping_methods', []);
+        $meta = $method->get_meta_data();
+        if (($chosen_methods[$index] ?? '') !== $method->get_id() || empty($meta['_europarcel_locker_name'])) {
+            return;
+        }
+        $address = implode(', ', array_filter([$meta['_europarcel_locker_address'], $meta['_europarcel_locker_locality'], $meta['_europarcel_locker_county']], 'strlen'));
+        echo wp_kses_post(EuroParcelComWC_Order_Locker::render($meta['carrier_id'], $meta['_europarcel_locker_name'], $address));
     }
 
     /**

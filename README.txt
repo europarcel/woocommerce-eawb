@@ -1,22 +1,22 @@
-=== EuroParcel Integration for WooCommerce ===
+=== eAWB for WooCommerce ===
 Contributors: europarcelcom
 Tags: woocommerce, shipping, europarcel, courier, romania
-Requires at least: 5.0
-Tested up to: 6.9
+Requires at least: 6.5
+Tested up to: 7.2
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.5.0
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
-Save up to 50% on shipping costs with EuroParcel. Access negotiated rates from top Romanian couriers directly in your WooCommerce store.
+Save up to 50% on shipping costs with eAWB. Access negotiated rates from top Romanian couriers directly in your WooCommerce store.
 
 == Description ==
 
-EuroParcel helps Romanian online stores ship smarter. We negotiate bulk rates with all major couriers so you can offer competitive shipping without the hassle of managing multiple contracts.
+eAWB helps Romanian online stores ship smarter. We negotiate bulk rates with all major couriers so you can offer competitive shipping without the hassle of managing multiple contracts.
 
 [Get started at eawb.ro](https://eawb.ro) | [Manage integration](https://eawb.ro/dashboard/integrations) | [Contact us](https://eawb.ro/contact)
 
-**Why EuroParcel?**
+**Why eAWB?**
 
 * **Save up to 50%** on shipping with pre-negotiated courier rates
 * **One integration, all couriers** – FAN Courier, DPD, Cargus, GLS, SameDay, FedEx and more
@@ -40,16 +40,16 @@ EuroParcel helps Romanian online stores ship smarter. We negotiate bulk rates wi
 == Installation ==
 
 1. Go to Plugins > Add New in your WordPress admin.
-2. Search for "EuroParcel".
+2. Search for "eAWB".
 3. Click "Install Now" and then "Activate".
-4. Go to WooCommerce > Settings > Shipping and add EuroParcel to your shipping zones.
-5. Enter your EuroParcel API credentials from [eawb.ro/dashboard/integrations](https://eawb.ro/dashboard/integrations).
+4. Go to WooCommerce > Settings > Shipping and add eAWB to your shipping zones.
+5. Enter your eAWB API credentials from [eawb.ro/dashboard/integrations](https://eawb.ro/dashboard/integrations).
 
 == Frequently Asked Questions ==
 
-= Do I need an EuroParcel account? =
+= Do I need an eAWB account? =
 
-Yes, you need an active EuroParcel account. [Create a free account at eawb.ro](https://eawb.ro/inregistrare) and get your API credentials from the [integrations dashboard](https://eawb.ro/dashboard/integrations).
+Yes, you need an active eAWB account. [Create a free account at eawb.ro](https://eawb.ro/inregistrare) and get your API credentials from the [integrations dashboard](https://eawb.ro/dashboard/integrations).
 
 = Does this plugin work with WooCommerce Blocks checkout? =
 
@@ -75,6 +75,16 @@ Yes, the plugin is fully compatible with WooCommerce High-Performance Order Stor
 4. Interactive locker map interface
 
 == Changelog ==
+
+= 1.5.0 =
+* Renamed to eAWB for WooCommerce, with the new eAWB logo
+* The chosen locker is shown with its network logo (easybox, FANbox, DPD) at checkout, in the cart, on the order received page, in My Account and in the order emails
+* Security: locker map messages are accepted only from maps.europarcel.com, locker details are rendered as text, and the locker AJAX accepts only the couriers the shipping method offers
+* Fixed: guest customers' chosen locker is kept after the checkout refreshes
+* Fixed: a locker chosen for another shipping zone is no longer applied to the current one
+* Declared compatible with the WooCommerce Cart and Checkout blocks
+* Order emails show the locker network logo as PNG (Outlook does not display WebP)
+* Tested with WordPress 7.1.5 and WooCommerce 11.3.1
 
 = 1.1.1 =
 * Added eAWB details inline under the shipping line item on the admin order edit screen for locker orders: carrier name, locker name & ID, full address, and a "See on map" button that opens maps.europarcel.com centered on the locker
@@ -116,6 +126,9 @@ Yes, the plugin is fully compatible with WooCommerce High-Performance Order Stor
 * HPOS compatibility
 
 == Upgrade Notice ==
+
+= 1.5.0 =
+eAWB rebranding, locker network logo for customers (cart, checkout, order page, emails) and security fixes. Existing settings and orders are kept. Requires WordPress 6.5 or newer.
 
 = 1.1.1 =
 Admin order view now shows the chosen carrier, delivery type, and locker details for eAWB shipping.

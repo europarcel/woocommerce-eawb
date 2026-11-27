@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the EuroParcel Integration for WooCommerce package.
 msgid ""
 msgstr ""
-"Project-Id-Version: EuroParcel Integration for WooCommerce\n"
+"Project-Id-Version: eAWB for WooCommerce\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -40,6 +40,10 @@ msgstr ""
 msgid "Locker location"
 msgstr ""
 
+#: includes/class-europarcel-order-locker.php:56
+msgid "Locker:"
+msgstr ""
+
 #: includes/class-europarcel-checkout.php:175
 #: includes/class-europarcel-checkout.php:419
 msgid "Select Locker"
@@ -55,10 +59,6 @@ msgstr ""
 
 #: includes/class-europarcel-checkout.php:178
 msgid "No couriers configured for locker delivery."
-msgstr ""
-
-#: includes/class-europarcel-checkout.php:179
-msgid "✓ Locker selected -"
 msgstr ""
 
 #: includes/class-europarcel-checkout.php:180
@@ -140,7 +140,7 @@ msgstr ""
 
 #: includes/class-europarcel-shipping.php:55
 #: includes/class-europarcel-shipping.php:104
-msgid "Europarcel Shipping"
+msgid "eAWB"
 msgstr ""
 
 #: includes/class-europarcel-shipping.php:56
